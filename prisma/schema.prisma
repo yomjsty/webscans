@@ -129,12 +129,13 @@ model Like {
 model Transaction {
   id        String   @id @default(uuid())
   userId    String   @map("user_id")
-  orderId   String
+  orderId   String   @unique
   amount    Int
   type      String
   item      String
   status    String
-  price     String
+  quantity  Int
+  price     Int
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id])
 

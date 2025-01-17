@@ -30,8 +30,8 @@ export async function POST(req: Request) {
             {
                 id: `coins-${coinAmount}`,
                 name: `${coinAmount} Coins`,
-                price: price, // ✅ Harga langsung dari request (tanpa pembulatan)
-                quantity: 1, // ✅ Karena kita menjual paket koin, bukan per koin
+                price: price,
+                quantity: 1,
             }
         ];
 
@@ -60,11 +60,12 @@ export async function POST(req: Request) {
             data: {
                 userId: session.user.id,
                 orderId,
-                amount: 1,
+                amount: coinAmount,
                 type: "Buy",
                 item: `${coinAmount} Coins`,
-                price: `${totalPrice} Rupiah`,
                 status: "Pending",
+                quantity: 1,
+                price: totalPrice,
             },
         });
 

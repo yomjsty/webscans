@@ -1,31 +1,27 @@
-import db from "@/lib/db";
 import { NextResponse } from "next/server";
+import db from "@/lib/db";
 
 export async function POST(req: Request) {
-  let orderId: string;
-  let transactionStatus: string;
-
   try {
     const body = await req.json();
-    orderId = body.order_id;
-    transactionStatus = body.transaction_status;
-  } catch {
-    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
-  }
+    const { order_id, transaction_status } = body;
 
-  const transaction = await db.transaction.findUnique({
-    where: { id: orderId },
-  });
+    console.log("Webhook received:", body);
 
-  if (!transaction) {
-    return NextResponse.json({ error: "Transaction not found" }, { status: 404 });
-  }
+    // Cek transaksi di database
+    const transaction = await db.transaction.findUnique({
+      where: { orderId: order_id },
+    });
 
-  if (transactionStatus === "settlement") {
-    try {
+    if (!transaction) {
+      return NextResponse.json({ error: "Transaction not found" }, { status: 404 });
+    }
+
+    // Update transaksi jika berhasil
+    if (transaction_status === "settlement") {
       await db.$transaction([
         db.transaction.update({
-          where: { id: orderId },
+          where: { orderId: order_id },
           data: { status: "completed" },
         }),
         db.user.update({
@@ -33,10 +29,11 @@ export async function POST(req: Request) {
           data: { coins: { increment: transaction.amount } },
         }),
       ]);
-    } catch {
-      return NextResponse.json({ error: "Failed to update transaction" }, { status: 500 });
     }
-  }
 
-  return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Webhook error:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
 }
