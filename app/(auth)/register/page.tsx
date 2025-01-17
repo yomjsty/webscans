@@ -23,14 +23,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-
-const formSchema = z.object({
-  name: z.string().min(2).max(50),
-  email: z.string().min(2).max(50),
-  password: z.string().min(2).max(50),
-});
+import { formSchema } from "@/lib/schema";
+import { authClient } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
+  const router = useRouter();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -40,8 +39,29 @@ export default function RegisterPage() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    const { name, email, password } = values;
+    await authClient.signUp.email(
+      {
+        email,
+        password,
+        name,
+      },
+      {
+        onRequest: (ctx) => {
+          // TODO: Loading button
+          console.log(ctx);
+        },
+        onSuccess: () => {
+          form.reset();
+          router.push("/");
+        },
+        onError: (ctx) => {
+          // TODO: Something went wrong
+          console.log(ctx);
+        },
+      }
+    );
   }
 
   return (
@@ -96,7 +116,9 @@ export default function RegisterPage() {
                 </FormItem>
               )}
             />
-            <Button type="submit">Submit</Button>
+            <Button className="w-full" type="submit">
+              Register
+            </Button>
           </form>
         </Form>
       </CardContent>
