@@ -37,37 +37,43 @@ model User {
 }
 
 model Comic {
-  id          String     @id @default(uuid())
-  title       String
-  description String
-  author      String
-  coverImage  String
-  genres      String[]
-  status      String // "Ongoing", "Completed"
-  chapters    Chapter[]
-  reviews     Review[]
-  likes       Like[]
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  Bookmark    Bookmark[]
+  id               String     @id @default(uuid())
+  title            String
+  slug             String     @unique
+  alternativeTitle String?
+  synopsis         String
+  author           String
+  coverImage       String
+  genres           String[]
+  status           String
+  releaseYear      Int
+  chapters         Chapter[]
+  reviews          Review[]
+  likes            Like[]
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  Bookmark         Bookmark[]
 
   @@map("comic")
 }
 
 model Novel {
-  id          String     @id @default(uuid())
-  title       String
-  description String
-  author      String
-  coverImage  String
-  genres      String[]
-  status      String // "Ongoing", "Completed"
-  chapters    Chapter[]
-  reviews     Review[]
-  likes       Like[]
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  Bookmark    Bookmark[]
+  id               String     @id @default(uuid())
+  title            String
+  slug             String     @unique
+  alternativeTitle String?
+  synopsis         String
+  author           String
+  coverImage       String
+  genres           String[]
+  status           String
+  releaseYear      Int
+  chapters         Chapter[]
+  reviews          Review[]
+  likes            Like[]
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  Bookmark         Bookmark[]
 
   @@map("novel")
 }

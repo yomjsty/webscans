@@ -29,7 +29,7 @@ export async function POST(req: Request) {
         const itemDetails = [
             {
                 id: `coins-${coinAmount}`,
-                name: `${coinAmount} Coins`,
+                name: `${coinAmount} coins`,
                 price: price,
                 quantity: 1,
             }
@@ -61,9 +61,9 @@ export async function POST(req: Request) {
                 userId: session.user.id,
                 orderId,
                 amount: coinAmount,
-                type: "Buy",
-                item: `${coinAmount} Coins`,
-                status: "Pending",
+                type: "buy",
+                item: `coins`,
+                status: "pending",
                 quantity: 1,
                 price: totalPrice,
             },

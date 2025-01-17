@@ -10,3 +10,15 @@ export const loginFormSchema = formSchema.pick({
     email: true,
     password: true,
 });
+
+export const createNovelSchema = z.object({
+    title: z.string().min(2, { message: "Title must be atleast 2 characters long" }),
+    slug: z.string(),
+    alternativeTitle: z.string().optional(),
+    synopsis: z.string().min(10, { message: "Synopsis must be atleast 10 characters long" }),
+    author: z.string().min(2, { message: "Author must be atleast 2 characters long" }),
+    coverImage: z.string().url({ message: "Please upload your image" }),
+    genre: z.array(z.string()).min(1, { message: "Please select atleast one genre" }),
+    status: z.enum(["ongoing", "completed", "hiatus", "canceled", "discontinued", "upcoming"]),
+    releaseYear: z.string().regex(/^\d{4}$/, { message: "Please enter a valid year" }),
+})
