@@ -5,7 +5,7 @@ import LikeButton from "@/components/like-button";
 import { getServerSession } from "@/actions/getServerSession";
 
 interface Props {
-    params: { slug: string }; // 'slug' parameter dari dynamic route
+    params: Promise<{ slug: string }>; // 'slug' parameter dari dynamic route
 }
 
 export default async function Page({ params }: Props) {
