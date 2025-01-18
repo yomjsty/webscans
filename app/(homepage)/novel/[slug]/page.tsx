@@ -3,6 +3,9 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import LikeButton from "@/components/like-button";
 import { getServerSession } from "@/actions/getServerSession";
+import BookmarkButton from "@/components/bookmark-button";
+import ReviewForm from "@/components/review-form";
+import ReviewsList from "@/components/review-list";
 
 interface Props {
     params: Promise<{ slug: string }>; // 'slug' parameter dari dynamic route
@@ -57,6 +60,9 @@ export default async function Page({ params }: Props) {
                 novelSlug={slug}
                 userId={userId}
             />
+            <BookmarkButton novelId={novel.id} userId={userId} />
+            <ReviewForm seriesId={novel.id} userId={userId} type="novel" />
+            <ReviewsList seriesId={novel.id} type="novel" userId={userId} />
         </div>
     );
 }

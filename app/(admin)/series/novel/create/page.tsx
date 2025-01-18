@@ -80,7 +80,7 @@ export default function Page() {
 
             if (response.ok) {
                 // Redirect or show success message
-                router.push("/series/create/novel");
+                router.push("/series/novel");
             } else {
                 // Handle errors
                 const errorData = await response.json();

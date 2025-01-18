@@ -107,15 +107,16 @@ model Bookmark {
 }
 
 model Review {
-  id      String  @id @default(uuid())
-  userId  String  @map("user_id")
-  comicId String? @map("comic_id")
-  novelId String? @map("novel_id")
-  rating  Int
-  comment String
-  user    User    @relation(fields: [userId], references: [id])
-  comic   Comic?  @relation(fields: [comicId], references: [id])
-  novel   Novel?  @relation(fields: [novelId], references: [id])
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  comicId   String?  @map("comic_id")
+  novelId   String?  @map("novel_id")
+  rating    Int
+  comment   String
+  user      User     @relation(fields: [userId], references: [id])
+  comic     Comic?   @relation(fields: [comicId], references: [id])
+  novel     Novel?   @relation(fields: [novelId], references: [id])
+  createdAt DateTime @default(now())
 
   @@map("review")
 }
