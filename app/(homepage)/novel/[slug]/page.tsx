@@ -24,6 +24,9 @@ export default async function Page({ params }: Props) {
             likes: {
                 where: { userId },
             },
+            Bookmark: {
+                where: { userId },
+            },
         },
     });
 
@@ -34,6 +37,7 @@ export default async function Page({ params }: Props) {
 
     // Periksa apakah pengguna sudah memberi like
     const initialLikeStatus = novel.likes.length > 0;
+    const initialBookmarkStatus = novel.Bookmark.length > 0;
 
     return (
         <div>
@@ -67,7 +71,11 @@ export default async function Page({ params }: Props) {
                 novelSlug={slug}
                 userId={userId}
             />
-            <BookmarkButton novelId={novel.id} userId={userId} />
+            <BookmarkButton
+                novelId={novel.id}
+                userId={userId}
+                initialBookmarkStatus={initialBookmarkStatus}
+            />
             <ReviewForm seriesId={novel.id} userId={userId} type="novel" />
             <ReviewsList seriesId={novel.id} type="novel" userId={userId} />
         </div>

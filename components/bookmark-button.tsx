@@ -5,34 +5,53 @@ import { useState } from "react";
 interface BookmarkButtonProps {
     novelId: string;
     userId: string | undefined;
+    initialBookmarkStatus: boolean;
 }
 
 export default function BookmarkButton({
     novelId,
     userId,
+    initialBookmarkStatus,
 }: BookmarkButtonProps) {
-    const [isBookmarked, setIsBookmarked] = useState(false);
+    const [isBookmarked, setIsBookmarked] = useState(initialBookmarkStatus);
+    const [loading, setLoading] = useState(false);
 
     const handleBookmark = async () => {
         if (!userId) return alert("You must be logged in to bookmark.");
+        setLoading(true);
 
-        const res = await fetch("/api/bookmark", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ novelId }),
-        });
+        try {
+            const res = await fetch("/api/bookmark", {
+                method: isBookmarked ? "DELETE" : "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ novelId }),
+            });
 
-        if (res.ok) {
-            setIsBookmarked(!isBookmarked);
+            if (res.ok) {
+                setIsBookmarked(!isBookmarked);
+            } else {
+                console.error("Failed to update bookmark status");
+            }
+        } catch (error) {
+            console.error("Error updating bookmark:", error);
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
         <button
             onClick={handleBookmark}
-            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded"
+            disabled={loading}
+            className={`mt-4 px-4 py-2 rounded ${
+                isBookmarked ? "bg-red-500" : "bg-blue-500"
+            } text-white`}
         >
-            {isBookmarked ? "Remove Bookmark" : "Add to Bookmark"}
+            {loading
+                ? "Processing..."
+                : isBookmarked
+                ? "Remove Bookmark"
+                : "Add to Bookmark"}
         </button>
     );
 }
