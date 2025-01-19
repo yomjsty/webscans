@@ -46,6 +46,12 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
         notFound();
     }
 
+    if (chapterData.isPremium && !userId) {
+        return (
+            <p>Anda harus login terlebih dahulu untuk membaca chapter ini.</p>
+        );
+    }
+
     // Jika chapter premium, cek apakah user sudah membeli
     if (chapterData.isPremium && userId) {
         const hasPurchased = await hasPurchasedChapter(userId, chapterData.id);
