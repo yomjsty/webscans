@@ -36,7 +36,7 @@ export default async function page() {
                         <TableHead>Order ID</TableHead>
                         <TableHead>Type</TableHead>
                         <TableHead>Item</TableHead>
-                        <TableHead>Amount</TableHead>
+                        <TableHead>Details</TableHead>
                         <TableHead>Quantity</TableHead>
                         <TableHead>Status</TableHead>
                         <TableHead className="text-right">Price</TableHead>
@@ -58,7 +58,7 @@ export default async function page() {
                             <TableCell className="capitalize">
                                 {transaction.item}
                             </TableCell>
-                            <TableCell>{transaction.amount}</TableCell>
+                            <TableCell>{transaction.details}</TableCell>
                             <TableCell>{transaction.quantity}</TableCell>
                             <TableCell className="capitalize">
                                 {transaction.status}

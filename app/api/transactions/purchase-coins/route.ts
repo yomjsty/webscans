@@ -63,6 +63,7 @@ export async function POST(req: Request) {
                 amount: coinAmount,
                 type: "buy",
                 item: `coins`,
+                details: `${coinAmount} coins`,
                 status: "pending",
                 quantity: 1,
                 price: totalPrice,

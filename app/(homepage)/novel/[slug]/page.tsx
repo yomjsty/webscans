@@ -6,6 +6,7 @@ import { getServerSession } from "@/actions/getServerSession";
 import BookmarkButton from "@/components/bookmark-button";
 import ReviewForm from "@/components/review-form";
 import ReviewsList from "@/components/review-list";
+import ChapterList from "@/components/chapter-list";
 
 interface Props {
     params: Promise<{ slug: string }>; // 'slug' parameter dari dynamic route
@@ -55,6 +56,12 @@ export default async function Page({ params }: Props) {
             </ul>
             <p>Status: {novel.status}</p>
             <p>Release Year: {novel.releaseYear}</p>
+            <ChapterList
+                parentSeriesId={novel.id}
+                type="novel"
+                seriesSlug={slug}
+                seriesTitle={`${novel.title} (Novel)`}
+            />
             <LikeButton
                 initialLikeStatus={initialLikeStatus} // Status like awal
                 novelSlug={slug}

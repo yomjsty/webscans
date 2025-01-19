@@ -79,17 +79,20 @@ model Novel {
 }
 
 model Chapter {
-  id        String   @id @default(uuid())
-  title     String
-  content   String
-  isPremium Boolean  @default(false)
-  price     Int      @default(12) // Coin price for premium chapters
-  comicId   String?  @map("comic_id")
-  novelId   String?  @map("novel_id")
-  comic     Comic?   @relation(fields: [comicId], references: [id])
-  novel     Novel?   @relation(fields: [novelId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id               String   @id @default(uuid())
+  title            String
+  slug             String
+  alternativeTitle String?
+  content          String
+  isPremium        Boolean  @default(false)
+  isPublished      Boolean  @default(false)
+  price            Int?     @default(12)
+  comicId          String?  @map("comic_id")
+  novelId          String?  @map("novel_id")
+  comic            Comic?   @relation(fields: [comicId], references: [id])
+  novel            Novel?   @relation(fields: [novelId], references: [id])
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   @@map("chapter")
 }
@@ -137,9 +140,11 @@ model Transaction {
   id        String   @id @default(uuid())
   userId    String   @map("user_id")
   orderId   String   @unique
+  chapterId String?
   amount    Int
   type      String
   item      String
+  details   String
   status    String
   quantity  Int
   price     Int

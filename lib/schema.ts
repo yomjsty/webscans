@@ -22,3 +22,14 @@ export const createNovelSchema = z.object({
     status: z.enum(["ongoing", "completed", "hiatus", "canceled", "discontinued", "upcoming"]),
     releaseYear: z.string().regex(/^\d{4}$/, { message: "Please enter a valid year" }),
 })
+
+export const createChapterSchema = z.object({
+    title: z.string().min(2, { message: "Title must be atleast 2 characters long" }),
+    slug: z.string(),
+    alternativeTitle: z.string().optional(),
+    content: z.string().min(10, { message: "Content must be atleast 10 characters long" }),
+    price: z.number().min(0, { message: "Put 0 if the chapter is free" }).optional(),
+    parentSeries: z.array(z.string()).min(1, { message: "Please select one serie only" }),
+    isPremium: z.boolean().optional(),
+    isPublished: z.boolean().optional(),
+})
