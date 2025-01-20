@@ -28,8 +28,11 @@ export default async function page() {
     });
 
     return (
-        <div>
-            <Table>
+        <div className="">
+            <div className="flex flex-col gap-2 pb-4 border-b border-slate-900">
+                <div className="text-2xl font-bold">Transaction</div>
+            </div>
+            <Table className="border">
                 <TableHeader className="bg-transparent">
                     <TableRow className="*:border-border hover:bg-transparent [&>:not(:last-child)]:border-r">
                         <TableHead>Date</TableHead>
@@ -73,9 +76,6 @@ export default async function page() {
                     ))}
                 </TableBody>
             </Table>
-            <p className="mt-4 text-center text-sm text-muted-foreground">
-                Table with vertical lines
-            </p>
         </div>
     );
 }

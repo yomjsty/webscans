@@ -17,7 +17,7 @@ import {
 export default async function Navbar() {
     const session = await getServerSession();
     return (
-        <nav className="bg-slate-950">
+        <nav className="bg-slate-950 border-b border-slate-700">
             <div className="max-w-screen-2xl mx-auto px-6 h-20 flex items-center text-slate-100 gap-4">
                 <div className="flex items-center gap-3 md:gap-8 md:mr-4">
                     <div className="">
@@ -63,9 +63,9 @@ export default async function Navbar() {
                     {session ? (
                         <UserButton user={session.user} />
                     ) : (
-                        <Button variant="secondary">
-                            <Link href="/login">Login</Link>
-                        </Button>
+                        <Link href="/login">
+                            <Button variant="secondary">Login</Button>
+                        </Link>
                     )}
                     <Sheet>
                         <SheetTrigger className="block md:hidden">
