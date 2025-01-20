@@ -81,7 +81,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
         } = {
             alternativeTitle,
             content,
-            price: isPremium ? price : null,
+            price: isPremium ? price : 0,
             slug,
             title,
             isPremium,

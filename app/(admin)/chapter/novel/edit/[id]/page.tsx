@@ -25,7 +25,7 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover";
-import { Check, ChevronDown } from "lucide-react";
+import { Check, ChevronDown, Loader2 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { z } from "zod";
 import {
@@ -36,6 +36,7 @@ import {
     CommandItem,
     CommandList,
 } from "@/components/ui/command";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Page() {
     const form = useForm<z.infer<typeof createChapterSchema>>({
@@ -56,6 +57,9 @@ export default function Page() {
     const chapterId = useParams().id;
     const [novels, setNovels] = useState<{ id: string; title: string }[]>([]);
     const [open, setOpen] = useState<boolean>(false);
+    const [loadingDraft, setLoadingDraft] = useState(false);
+    const [loadingCreate, setLoadingCreate] = useState(false);
+    const { toast } = useToast();
 
     // Fetch available novel series
     useEffect(() => {
@@ -108,6 +112,11 @@ export default function Page() {
         values: z.infer<typeof createChapterSchema>,
         isPublished: boolean
     ) {
+        if (isPublished) {
+            setLoadingCreate(true);
+        } else {
+            setLoadingDraft(true);
+        }
         try {
             const response = await fetch(`/api/edit/chapter/${chapterId}`, {
                 method: "PUT",
@@ -116,13 +125,30 @@ export default function Page() {
             });
 
             if (response.ok) {
+                toast({
+                    description: isPublished
+                        ? "Novel edited"
+                        : "Saved to draft",
+                });
                 router.push("/chapter/novel");
             } else {
                 const errorData = await response.json();
-                alert(errorData.message);
+                toast({
+                    description: errorData.message,
+                    variant: "destructive",
+                });
             }
         } catch {
-            alert("Something went wrong, please try again.");
+            toast({
+                description: "Something went wrong, please try again.",
+                variant: "destructive",
+            });
+        }
+
+        if (isPublished) {
+            setLoadingCreate(false);
+        } else {
+            setLoadingDraft(false);
         }
     }
 
@@ -307,8 +333,10 @@ export default function Page() {
                             control={form.control}
                             name="isPremium"
                             render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Premium</FormLabel>
+                                <FormItem className="flex flex-col gap-1">
+                                    <FormLabel htmlFor="premium">
+                                        Premium
+                                    </FormLabel>
                                     <FormControl>
                                         <Checkbox
                                             id="premium"
@@ -348,8 +376,16 @@ export default function Page() {
                                         onSubmit(values, false)
                                     )()
                                 }
+                                disabled={loadingDraft || loadingCreate}
                             >
-                                Save to Draft
+                                {loadingDraft ? (
+                                    <span className="flex gap-2 items-center">
+                                        <Loader2 className="animate-spin" />{" "}
+                                        Saving to Draft...
+                                    </span>
+                                ) : (
+                                    "Edit & Save to Draft"
+                                )}
                             </Button>
                             <Button
                                 type="button"
@@ -358,8 +394,16 @@ export default function Page() {
                                         onSubmit(values, true)
                                     )()
                                 }
+                                disabled={loadingDraft || loadingCreate}
                             >
-                                Submit
+                                {loadingCreate ? (
+                                    <span className="flex gap-2 items-center">
+                                        <Loader2 className="animate-spin" />{" "}
+                                        Editing...
+                                    </span>
+                                ) : (
+                                    "Edit & Publish"
+                                )}
                             </Button>
                         </div>
                     </form>

@@ -35,8 +35,10 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover";
-import { Check, ChevronDown } from "lucide-react";
+import { Check, ChevronDown, Loader2 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Page() {
     const form = useForm<z.infer<typeof createChapterSchema>>({
@@ -57,6 +59,9 @@ export default function Page() {
     const id = useId();
     const [open, setOpen] = useState<boolean>(false);
     const [novels, setNovels] = useState<{ id: string; title: string }[]>([]);
+    const [loadingDraft, setLoadingDraft] = useState(false);
+    const [loadingCreate, setLoadingCreate] = useState(false);
+    const { toast } = useToast();
 
     // Fetch available novel series
     useEffect(() => {
@@ -87,6 +92,12 @@ export default function Page() {
         values: z.infer<typeof createChapterSchema>,
         isPublished: boolean
     ) {
+        if (isPublished) {
+            setLoadingCreate(true);
+        } else {
+            setLoadingDraft(true);
+        }
+
         try {
             const response = await fetch("/api/create/novel/chapter", {
                 method: "POST",
@@ -95,13 +106,30 @@ export default function Page() {
             });
 
             if (response.ok) {
+                toast({
+                    description: isPublished
+                        ? "Novel created"
+                        : "Saved to draft",
+                });
                 router.push("/chapter/novel");
             } else {
                 const errorData = await response.json();
-                alert(errorData.message);
+                toast({
+                    description: errorData.message,
+                    variant: "destructive",
+                });
             }
         } catch {
-            alert("Something went wrong, please try again.");
+            toast({
+                description: "Something went wrong, please try again.",
+                variant: "destructive",
+            });
+        }
+
+        if (isPublished) {
+            setLoadingCreate(false);
+        } else {
+            setLoadingDraft(false);
         }
     }
 
@@ -226,7 +254,7 @@ export default function Page() {
                                                     />
                                                 </Button>
                                             </PopoverTrigger>
-                                            <PopoverContent className="w-full p-0">
+                                            <PopoverContent className="p-0">
                                                 <Command>
                                                     <CommandInput placeholder="Search novel..." />
                                                     <CommandList>
@@ -249,7 +277,7 @@ export default function Page() {
                                                                                 [
                                                                                     novel.id,
                                                                                 ]
-                                                                            ); // Only set one ID
+                                                                            );
                                                                             setOpen(
                                                                                 false
                                                                             );
@@ -284,13 +312,12 @@ export default function Page() {
                                 </FormItem>
                             )}
                         />
-
                         <FormField
                             control={form.control}
                             name="isPremium"
                             render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Premium</FormLabel>
+                                <FormItem className="flex flex-col gap-1">
+                                    <Label htmlFor="premium">Premium</Label>
                                     <FormControl>
                                         <Checkbox
                                             id="premium"
@@ -308,7 +335,9 @@ export default function Page() {
                                 name="price"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Price</FormLabel>
+                                        <FormLabel>
+                                            Price <Badge>coins</Badge>
+                                        </FormLabel>
                                         <FormControl>
                                             <Input
                                                 type="number"
@@ -330,8 +359,16 @@ export default function Page() {
                                         onSubmit(values, false)
                                     )()
                                 }
+                                disabled={loadingDraft || loadingCreate}
                             >
-                                Save to Draft
+                                {loadingDraft ? (
+                                    <span className="flex gap-2 items-center">
+                                        <Loader2 className="animate-spin" />{" "}
+                                        Saving to Draft...
+                                    </span>
+                                ) : (
+                                    "Save to Draft"
+                                )}
                             </Button>
                             <Button
                                 type="button"
@@ -340,8 +377,16 @@ export default function Page() {
                                         onSubmit(values, true)
                                     )()
                                 }
+                                disabled={loadingDraft || loadingCreate}
                             >
-                                Submit
+                                {loadingCreate ? (
+                                    <span className="flex gap-2 items-center">
+                                        <Loader2 className="animate-spin" />{" "}
+                                        Creating...
+                                    </span>
+                                ) : (
+                                    "Create"
+                                )}
                             </Button>
                         </div>
                     </form>

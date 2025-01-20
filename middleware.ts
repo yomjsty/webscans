@@ -20,7 +20,6 @@ export default async function authMiddleware(request: NextRequest) {
 	const isAdmin = session?.user.role === "admin";
 	const isAuthenticated = !!session;
 
-	// Hanya admin yang bisa mengakses /dashboard, /chapter, /series
 	if (
 		/^\/(dashboard|chapter|series)/.test(pathname) &&
 		!isAdmin
@@ -28,7 +27,6 @@ export default async function authMiddleware(request: NextRequest) {
 		return NextResponse.redirect(new URL("/", request.url));
 	}
 
-	// /login dan /register hanya bisa diakses jika belum login
 	if (
 		/^\/(login|register)/.test(pathname) &&
 		isAuthenticated
@@ -36,7 +34,6 @@ export default async function authMiddleware(request: NextRequest) {
 		return NextResponse.redirect(new URL("/", request.url));
 	}
 
-	// /profile dan /buy hanya bisa diakses jika sudah login
 	if (
 		/^\/(profile|buy)/.test(pathname) &&
 		!isAuthenticated

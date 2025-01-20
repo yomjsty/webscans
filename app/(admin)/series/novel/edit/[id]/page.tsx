@@ -35,6 +35,8 @@ import { Tag, TagInput } from "emblor";
 import { useState, useEffect } from "react";
 import CoverImageUpload from "@/components/CoverImageUpload";
 import slugify from "slugify";
+import { useToast } from "@/hooks/use-toast";
+import { Loader2 } from "lucide-react";
 
 export default function Page() {
     const form = useForm<z.infer<typeof createNovelSchema>>({
@@ -56,6 +58,8 @@ export default function Page() {
     const { id } = useParams();
     const [, setTags] = useState<Tag[]>([]);
     const [activeTagIndex, setActiveTagIndex] = useState<number | null>(null);
+    const [loading, setLoading] = useState(false);
+    const { toast } = useToast();
 
     useEffect(() => {
         async function fetchNovelDetails() {
@@ -65,7 +69,7 @@ export default function Page() {
                     const novel = await response.json();
                     form.reset({
                         ...novel,
-                        genre: novel.genres || [], // Ensure genre is always an array
+                        genre: novel.genres || [],
                     });
                 } else {
                     console.error("Failed to fetch novel details");
@@ -89,31 +93,36 @@ export default function Page() {
     };
 
     async function onSubmit(values: z.infer<typeof createNovelSchema>) {
+        setLoading(true);
         try {
-            console.log("Submitting data:", values); // Log form data
-
             const response = await fetch(`/api/edit/novel/${id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify(values), // Ensure it's an object
+                body: JSON.stringify(values),
             });
 
-            // Log the raw response before parsing as JSON
-            console.log("Response status:", response.status);
-            const textResponse = await response.text(); // Use text to check for raw response
-            console.log("Raw response:", textResponse);
+            const textResponse = await response.text();
 
             if (response.ok) {
+                toast({
+                    description: "Novel edited",
+                });
                 router.push("/series/novel");
             } else {
-                alert(textResponse || "Error occurred.");
+                toast({
+                    description: textResponse || "Error occurred.",
+                    variant: "destructive",
+                });
             }
-        } catch (error) {
-            console.error("Error during submit:", error);
-            alert("Something went wrong, please try again.");
+        } catch {
+            toast({
+                description: "Something went wrong, please try again.",
+                variant: "destructive",
+            });
         }
+        setLoading(false);
     }
 
     function setCoverImage(url: string) {
@@ -336,7 +345,16 @@ export default function Page() {
                                 </FormItem>
                             )}
                         />
-                        <Button type="submit">Submit</Button>
+                        <Button type="submit" disabled={loading}>
+                            {loading ? (
+                                <span className="flex gap-2 items-center">
+                                    <Loader2 className="animate-spin" />{" "}
+                                    Editing...
+                                </span>
+                            ) : (
+                                "Edit"
+                            )}
+                        </Button>
                     </form>
                 </Form>
             </CardContent>

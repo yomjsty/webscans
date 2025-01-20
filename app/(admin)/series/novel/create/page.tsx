@@ -35,6 +35,8 @@ import { Tag, TagInput } from "emblor";
 import { useId, useState } from "react";
 import CoverImageUpload from "@/components/CoverImageUpload";
 import slugify from "slugify";
+import { Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Page() {
     const form = useForm<z.infer<typeof createNovelSchema>>({
@@ -56,6 +58,8 @@ export default function Page() {
     const id = useId();
     const [, setTags] = useState<Tag[]>([]);
     const [activeTagIndex, setActiveTagIndex] = useState<number | null>(null);
+    const [loading, setLoading] = useState(false);
+    const { toast } = useToast();
 
     const handleTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const titleValue = event.target.value;
@@ -68,8 +72,8 @@ export default function Page() {
     };
 
     async function onSubmit(values: z.infer<typeof createNovelSchema>) {
+        setLoading(true);
         try {
-            // Send form data to the API route
             const response = await fetch("/api/create/novel", {
                 method: "POST",
                 headers: {
@@ -79,16 +83,24 @@ export default function Page() {
             });
 
             if (response.ok) {
-                // Redirect or show success message
+                toast({
+                    description: "Novel created",
+                });
                 router.push("/series/novel");
             } else {
-                // Handle errors
                 const errorData = await response.json();
-                alert(errorData.message);
+                toast({
+                    description: errorData.message,
+                    variant: "destructive",
+                });
             }
         } catch {
-            alert("Something went wrong, please try again.");
+            toast({
+                description: "Something went wrong, please try again.",
+                variant: "destructive",
+            });
         }
+        setLoading(false);
     }
 
     function setCoverImage(url: string) {
@@ -313,7 +325,16 @@ export default function Page() {
                                 </FormItem>
                             )}
                         />
-                        <Button type="submit">Submit</Button>
+                        <Button type="submit" disabled={loading}>
+                            {loading ? (
+                                <span className="flex gap-2 items-center">
+                                    <Loader2 className="animate-spin" />{" "}
+                                    Creating...
+                                </span>
+                            ) : (
+                                "Create"
+                            )}
+                        </Button>
                     </form>
                 </Form>
             </CardContent>

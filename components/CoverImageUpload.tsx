@@ -16,8 +16,6 @@ export default function CoverImageUpload({ onUpload }: CoverImageUploadProps) {
             <UploadButton
                 endpoint="coverImage"
                 onClientUploadComplete={(res) => {
-                    console.log("Uploaded Files: ", res);
-
                     const uploadedImageUrl = res?.[0]?.url;
                     if (uploadedImageUrl) {
                         setImageUrl(uploadedImageUrl);

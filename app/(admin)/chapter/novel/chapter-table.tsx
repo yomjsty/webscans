@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import {
     Table,
     TableBody,
@@ -6,32 +7,44 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import db from "@/lib/db";
 import ActionButton from "@/components/action-button";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
 
-export default async function page() {
-    const chapters = await db.chapter.findMany({
-        orderBy: {
-            createdAt: "desc",
-        },
-        include: {
-            novel: true,
-        },
+interface ChapterTableProps {
+    chapters: {
+        id: string;
+        title: string;
+        alternativeTitle: string | null;
+        novel?: { title: string };
+        isPremium: boolean;
+        price?: number;
+        isPublished: boolean;
+    }[];
+}
+
+export default function ChapterTable({ chapters }: ChapterTableProps) {
+    const [searchQuery, setSearchQuery] = useState("");
+
+    // Fungsi untuk memfilter data berdasarkan query pencarian
+    const filteredChapters = chapters.filter((chapter) => {
+        const searchLower = searchQuery.toLowerCase();
+        return (
+            chapter.title.toLowerCase().includes(searchLower) ||
+            chapter.alternativeTitle?.toLowerCase().includes(searchLower) ||
+            chapter.novel?.title.toLowerCase().includes(searchLower)
+        );
     });
 
     return (
-        <div className="space-y-4">
-            <div className="flex justify-between">
-                <div className="text-2xl font-bold">Novel Chapter Page</div>
-                <Button className="ml-auto">
-                    <Link href="/chapter/novel/create">
-                        Create Novel Chapter
-                    </Link>
-                </Button>
+        <div>
+            <div className="mb-4">
+                <input
+                    type="text"
+                    placeholder="Search Chapters..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="px-4 py-2 border rounded"
+                />
             </div>
-
             <div className="w-full">
                 <Table>
                     <TableHeader>
@@ -48,7 +61,7 @@ export default async function page() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {chapters.map((chapter) => (
+                        {filteredChapters.map((chapter) => (
                             <TableRow key={chapter.id}>
                                 <TableCell className="font-medium">
                                     {chapter.novel?.title}
